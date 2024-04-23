@@ -4,9 +4,7 @@ An immediate Mode GUI Library for [Picotron](https://www.lexaloffle.com/picotron
 
 ![Preview](/imgs/pguiclip.gif)
 
-<script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#29abe0', 'H2H8X903V');kofiwidget2.draw();</script> 
-
-<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="srsergior" data-color="#FFDD00" data-emoji=""  data-font="Bree" data-text="Donate!" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+<a href='https://ko-fi.com/H2H8X903V' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 - [PGUI](#pgui)
   - [Installation](#installation)
@@ -352,8 +350,6 @@ This library was made by Sergio Rodríguez Gómez
 
 If you like this library please consider supporting my work!
 
-<script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#29abe0', 'H2H8X903V');kofiwidget2.draw();</script>
-
-<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="srsergior" data-color="#FFDD00" data-emoji=""  data-font="Bree" data-text="Donate!" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+<a href='https://ko-fi.com/H2H8X903V' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 You can also check some of my other work on [itch](https://srsergior.itch.io/) or in this github account, like my Pico-8 games or [bebop](https://srsergior.itch.io/bebop), my music generator for games and video soundtracks.
