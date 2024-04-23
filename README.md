@@ -295,13 +295,15 @@ Returns: Table containing the return values of the contained components in its s
 
 #### Scrollable
 
-A container box that allows its content to be scrolled with the mousewheel or trackpad gesture. (Still needs some polish to work perfectly)
+A container box that clips the content that exceeds its size and can be scrolled with the mousewheel or a trackpad gesture. 
+
+To use this component, you must run the function `pgui:activate_clipping()` in your _init function first.
 
 `pgui:component("scrollable",label="scrll",scroll_x=true,scroll_y=false,size=vec(50,50),sensibility=4,content={}})`
 
 Options:
 - **label**. string. REQUIRED. Unique name for keeping internal state.
-- **size**. vector. Desired size of scrollable area. If any axis is set to 0 it will adapt to content's size. Weird behavior when size is bigger than content's size.
+- **size**. vector. Desired size of scrollable area. If any axis is set to 0 it will adapt to content's size.
 - **scroll_x**. boolean. Allow x axis scrolling.
 - **scroll_y**. boolean. Allow y axis scrolling.
 - **content**. table. A table representing the data of a component to put inside the scrollable area, it must contain: `{NAME_OF_COMPONENT, {OPTIONS_OF_COMPONENT}}`.
@@ -350,6 +352,12 @@ This library was made by Sergio Rodríguez Gómez
 
 If you like this library please consider supporting my work!
 
+You can use this Ko-fi button:
+
 <a href='https://ko-fi.com/H2H8X903V' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
-You can also check some of my other work on [itch](https://srsergior.itch.io/) or in this github account, like my Pico-8 games or [bebop](https://srsergior.itch.io/bebop), my music generator for games and video soundtracks.
+Or go to my Buy me a coffee page: [buymeacoffee.com/srsergior](buymeacoffee.com/srsergior)
+
+Everything counts. I want to develop other cool tools and games.
+
+You can also check some of my other work on [itch](https://srsergior.itch.io/) or in this github account, like my Pico-8 games or [bebop](https://srsergior.itch.io/bebop), a music generator for games and video soundtracks.
