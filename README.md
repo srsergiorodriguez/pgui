@@ -2,6 +2,8 @@
 
 An immediate Mode GUI Library for [Picotron](https://www.lexaloffle.com/picotron.php)
 
+![Preview](/imgs/pguiclip.gif)
+
 - [PGUI](#pgui)
   - [Installation](#installation)
   - [General usage](#general-usage)
@@ -322,6 +324,8 @@ The colors in the palette are used in components as follows:
 |4               |stroke colors for borders and text                     |0              |
 |5               |not used yet                                           |7              |
 |6               |not used yet                                           |6              |
+
+You can set a new table for your general palette with the function `pgui:set_palette(TABLE)`.
 
 ## Future expansions
 
