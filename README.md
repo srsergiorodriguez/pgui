@@ -10,7 +10,9 @@ Consider a donation!
 
 [buymeacoffee.com/srsergior](buymeacoffee.com/srsergior)
 
+# Table of contents
 - [PGUI](#pgui)
+- [Table of contents](#table-of-contents)
   - [Installation](#installation)
   - [General usage](#general-usage)
   - [List of components](#list-of-components)
