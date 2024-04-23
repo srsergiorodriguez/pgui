@@ -4,7 +4,11 @@ An immediate Mode GUI Library for [Picotron](https://www.lexaloffle.com/picotron
 
 ![Preview](/imgs/pguiclip.gif)
 
+Consider a donation!
+
 <a href='https://ko-fi.com/H2H8X903V' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+[buymeacoffee.com/srsergior](buymeacoffee.com/srsergior)
 
 - [PGUI](#pgui)
   - [Installation](#installation)
