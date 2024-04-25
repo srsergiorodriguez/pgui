@@ -345,18 +345,18 @@ You can set a new table for your general palette with the function `pgui:set_pal
 
 ## Future expansions
 
-In the future, I would like to a couple of extra components: a text area, a typewritter text effect, an xy kaoss pad box style, a knob...
+In the future, I would like to a couple of extra components: a text area, a typewritter text effect, an xy kaoss pad box style, a knob, a plot and oscilloscope...
 
 ## Limitations
 
-There is no zindex configuration, components are renderer in the order they are created. For the same reason, mouse events activate even when there are overlapping components. There are ways to deactivate buttons response when dropdowns are overlapping, But it is a little more involved, see showcase.lua example.
+There is no zindex configuration, components are renderer in the order they are created. For the same reason, mouse events activate even when there are overlapping components. There are ways to deactivate buttons response when dropdowns are overlapping, but it is a little more involved, see showcase.lua example.
 
 I tried to make the library efficient, but depending on the number of components you use, it can still can become resource intensive. There are two tricks you can use to consume less cpu:
 
-- You can deactivate the clipping of components, if you are not using any scrollable component. This will reduce computations a little bit.
+- Clipping of components is disabled by default, you can keep it like this if you are not using any scrollable component. This will reduce computations a little bit.
 - You can refresh and update your components every other frame by useing a counter and a modulo operator.
 
-If the library is too heavy and you need space, you can delete the components that you are using.
+If the library is too heavy and you need space, you can delete the components that you are not using, just take into account that some components require others (mostly text boxes, text and boxes, so don't delete those!)
 
 ## Support my work!
 
