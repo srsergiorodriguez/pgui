@@ -6,7 +6,13 @@ An immediate Mode GUI Library for [Picotron](https://www.lexaloffle.com/picotron
 
 Consider a donation!
 
+Through Ko-fi:
+
 <a href='https://ko-fi.com/H2H8X903V' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+Through Buy me a coffee:
+
+<a href="https://www.buymeacoffee.com/devvie"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me Okpa&emoji=🍘&slug=devvie&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
 
 [buymeacoffee.com/srsergior](buymeacoffee.com/srsergior)
 
@@ -46,13 +52,13 @@ Then include the file in your main Picotron code with `include "pgui.lua"`
 
 ## General usage
 
-Because this this GUI library follows the [Immediate Mode](https://en.wikipedia.org/wiki/Immediate_mode_GUI) pattern, all GUI components are updated and rendered each frame in the program. The code execution is divided in two parts, following the game loop used in Picotron: an update part, where most calculations for the gui are made and you get return values from the components, and a draw part, where the graphical elements of the components are rendered.
+Because this this GUI library follows the [Immediate Mode](https://en.wikipedia.org/wiki/Immediate_mode_GUI) pattern, all GUI components are updated and rendered each frame in the program. The code execution is divided in two parts, following the game loop used in Picotron: an update part, where most calculations for the GUI are made and you get return values from the components, and a draw part, where the graphical elements of the components are rendered.
 
 For pgui to work, you have two put two basic functions:
 
 `pgui:refresh()` at the beginning of your _update function. This will restart the list of components to render and make some general calculations.
 
-`pgui:draw()` at your _draw function. This will render the components.
+`pgui:draw()` in your _draw function. This will render the components.
 
 Additionally, in _update, after the refresh function, you put all the components that are part of your desired GUI. There is a set of basic components like buttons, text input boxes, radio buttons, checkboxes, sliders, and others, and there are some layout components that can nest other components and are useful for grouping and organizing, like dropdowns, vertical and horizontal stacks, a covenience top menu bar, and a scrollable container.
 
@@ -60,7 +66,7 @@ All components are created by using the component function. The first argument i
 
 `pgui:component(NAME, {OPTIONS})`
 
-Components return values that you can use as like in your code. In most cases, you have to feed the return value back into the component so it can keep track of its state.
+Components return values that you can use as like in your code. In most cases, you have to feed the return value back into a particular option of the component so it can keep track of its state.
 
 This is a simple example of a slider controlling the size of a circle:
 
@@ -69,25 +75,25 @@ include "pgui.lua"
 
 function _init()
   -- Define the initial value of the slider
-	slidervalue = 10
+  slidervalue = 10
 end
 
 function _update()
   -- Refresh pgui each frame
-	pgui:refresh()
-	
+  pgui:refresh()
+  
   -- Create a slider and set its value back from its return value
-	slidervalue = pgui:component("hslider",{pos=vec(190,20),value=slidervalue})
+  slidervalue = pgui:component("hslider",{pos=vec(190,20),value=slidervalue})
 end
 
 function _draw()
-	cls(5)
+  cls(5)
 	
   -- Draw the circle, its size is based on the return value of the slider
-	circfill(240,140,slidervalue,8)
-
-   -- Draw all pgui components	
-	pgui:draw()
+  circfill(240,140,slidervalue,8)
+  
+  -- Draw all pgui components	
+  pgui:draw()
 end
 ```
 
@@ -97,11 +103,11 @@ This is the detailed list of component available in the library, their options w
 
 NOTE 1: If you want to use default values, you can omit them in the options table you pass to the component function.
 
-NOTE 2: Some components need to store some persistent information. To achieve this, an internal dictionary keeps track of the state of the component. For this components you need to include a unique label in the options. Specially if you have more than one of the same component.
+NOTE 2: Some components need to store some persistent information. To achieve this, an internal dictionary keeps track of the state of the component. For these components you need to include a unique label in the options. Specially if you have more than one of the same component, so the library can differentiate between them.
 
 NOTE 3: There are a couple of options that ALL components have, so they will not be listed:
 
-- **pos**. vector. The position of the component relative to its container (or to the display if it has no container). Default: `pos=vec(0,0)`.
+- **pos**. vector. The position of the component relative to its container (or to the app window if it has no container). Default: `pos=vec(0,0)`.
 - **color**. table. The color palette used. Default: `color= {7,18,12,0,7,6}`. See the palette section below.
 
 ### Basic components
