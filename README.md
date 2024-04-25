@@ -12,8 +12,6 @@ Through Ko-fi:
 
 Through Buy me a coffee:
 
-<a href="https://www.buymeacoffee.com/srsergio"><img src="https://img.buymeacoffee.com/button-api/?text=Donate&slug=devvie&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
-
 [buymeacoffee.com/srsergior](buymeacoffee.com/srsergior)
 
 # Table of contents
