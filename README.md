@@ -303,6 +303,8 @@ Options:
 
 Returns: Table containing the return values of the contained components in its stack, in order. Table.
 
+NOTE: if you want to close the dropdown with code, for instance after clicking a button inside, you can use `pgui:set_store("LABEL_OF_DROPDOWN",false,true)`, by replacing "LABEL_OF_DROPDOWN" with your label you used for your dropdown. This will set the store that keeps track of state of the dropdown to false and will effectively close it.
+
 #### Scrollable
 
 A container box that clips the content that exceeds its size and can be scrolled with the mousewheel or a trackpad gesture. 
