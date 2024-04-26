@@ -41,6 +41,8 @@ Through Buy me a coffee:
   - [Future expansions](#future-expansions)
   - [Limitations](#limitations)
   - [Support my work!](#support-my-work)
+  - [Changelog](#changelog)
+    - [1.0.1](#101)
 
 ## Installation
 
@@ -107,6 +109,7 @@ NOTE 3: There are a couple of options that ALL components have, so they will not
 
 - **pos**. vector. The position of the component relative to its container (or to the app window if it has no container). Default: `pos=vec(0,0)`.
 - **color**. table. The color palette used. Default: `color= {7,18,12,0,7,6}`. See the palette section below.
+- **layer**. number. Order of rendering. Default: `layer=0`. pgui normally just renders the components in the order they are created, and that's enough for most cases. However, if you want more control over it, you can set a higher layer number. pgui always renders dropdowns contents one layer higher than its parent toggle button.
 
 ### Basic components
 
@@ -303,7 +306,7 @@ Options:
 
 Returns: Table containing the return values of the contained components in its stack, in order. Table.
 
-NOTE: if you want to close the dropdown with code, for instance after clicking a button inside, you can use `pgui:set_store("LABEL_OF_DROPDOWN",false,true)`, by replacing "LABEL_OF_DROPDOWN" with your label you used for your dropdown. This will set the store that keeps track of state of the dropdown to false and will effectively close it.
+NOTE: if you want to close the dropdown with code, for instance after clicking a button inside, you can use `pgui:set_store("LABEL_OF_DROPDOWN",false,true)`, by replacing "LABEL_OF_DROPDOWN" with the label you used for your dropdown. This will set the store that keeps track of state of the dropdown to false and will effectively close it.
 
 #### Scrollable
 
@@ -347,9 +350,9 @@ You can set a new table for your general palette with the function `pgui:set_pal
 
 In the future, I would like to a couple of extra components: a text area, a typewritter text effect, an xy kaoss pad box style, a knob, a plot and oscilloscope...
 
-## Limitations
+Text input is very simple, it doesn't respond to double clicking or to supr key, only to backspace.
 
-There is no zindex configuration, components are renderer in the order they are created. For the same reason, mouse events activate even when there are overlapping components. There are ways to deactivate buttons response when dropdowns are overlapping, but it is a little more involved, see showcase.lua example.
+## Limitations
 
 I tried to make the library efficient, but depending on the number of components you use, it can still can become resource intensive. There are two tricks you can use to consume less cpu:
 
@@ -373,3 +376,10 @@ Or go to my Buy me a coffee page: [buymeacoffee.com/srsergior](buymeacoffee.com/
 Everything counts. I want to develop other cool tools and games.
 
 You can also check some of my other work on [itch](https://srsergior.itch.io/) or in this github account, like my Pico-8 games or [bebop](https://srsergior.itch.io/bebop), a music generator for games and video soundtracks.
+
+## Changelog
+
+### 1.0.1
+
+- Minor performance improvements
+- Implemented layering
