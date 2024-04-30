@@ -23,6 +23,7 @@ Through Buy me a coffee:
     - [Basic components](#basic-components)
       - [Box](#box)
       - [Text box](#text-box)
+      - [Sprite box](#sprite-box)
       - [Input](#input)
       - [Button](#button)
       - [Horizontal slider](#horizontal-slider)
@@ -43,6 +44,7 @@ Through Buy me a coffee:
   - [Support my work!](#support-my-work)
   - [Changelog](#changelog)
     - [1.0.1](#101)
+    - [1.0.2](#102)
 
 ## Installation
 
@@ -142,6 +144,22 @@ Options:
 
 Returns: "text_box". string.
 
+#### Sprite box
+
+A box with a sprite inside
+
+`pgui:component("sprite_box",{sprite=0,margin=2,stroke=true,active=false,hover=false,fn=function() end}})`
+
+Options:
+- **sprite**. number. Number of sprite in spritesheet.
+- **margin**. number. Margin separating sprite from border from all sides.
+- **stroke**. boolean. Show border or not.
+- **active**. boolean. Change color of box when clicked.
+- **hover**. boolean. Change color of box when hovered on.
+- **fn**. function. Function to run before drawing the sprite. This can be used to set colors transparence with `palt()` before drawing the sprite. 
+
+Returns: "box". string.
+
 #### Input
 
 A text input box with a cursor
@@ -170,11 +188,13 @@ Options:
 
 Returns: if was clicked. boolean.
 
+Note: when clicked, it will return true for just one frame!
+
 #### Horizontal slider
 
 A horizontal slider
 
-`pgui:component("hslider",{min=0,max=100,value=50,size=vec(100,10),stroke=true,format=function(v) return v end}})`
+`pgui:component("hslider",{min=0,max=100,value=50,size=vec(100,10),stroke=true,format=function(v) return v end,flr=false}})`
 
 options:
 - **min**. number. Minimum value allowed.
@@ -182,6 +202,7 @@ options:
 - **value**. number. Current value of slider.
 - **size**. vector. Size of the component. Width and height.
 - **format**. function. Function to format the value display inside the slider.
+- **flr**. boolean. floor / snap value to an integer
 
 Returns: value. number.
 
@@ -233,16 +254,16 @@ returns: value. boolean.
 
 Shows selectable sample boxes from a list of colors
 
-`pgui:component("palette",{columns=4,gap=3,box_size=10,colors={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15},selected=1})`
+`pgui:component("palette",{columns=4,gap=3,box_size=10,colors={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15},selected=0})`
 
 Options:
 - **columns**. numbers. Max number of samples per rows.
 - **gap**. number. Vertical and horizontal gap between samples.
 - **box_size**. number. Size of each sample. Just one number for width and height because it's a square.
 - **colors**. table of numbers. Indexes of colors to include in the palett.
-- **selected**. number. Index of currently selected color.
+- **selected**. number. number code of currently selected color.
 
-Returns: selected. number.
+Returns: selected. number. currently selected color
 
 ### Layout components
 
@@ -252,13 +273,14 @@ Layout components are used to group and organize basic components or other layou
 
 Groups a list of components horizontally. Its size will adapt to the size of the stacked contents.
 
-`pgui:component("hstack",{stroke=true,width=0,margin=3,gap=3,contents={}})`
+`pgui:component("hstack",{stroke=true,width=0,margin=3,gap=3,box=true,contents={}})`
 
 Options:
 - **stroke**. boolean. Show border or not.
 - **width**. number. If 0, the width of the stack wil adapt to its contents, if > 0 it will be set to the value specified.
 - **margin**. number. Margin separating contents from border from all sides.
-- **gap**. number. horizontal gap between components.
+- **gap**. number. Horizontal gap between components.
+- **box**. boolean. Draw containing box.
 - **contents**. list of tables. A list of tables, each subtable represents a component to put inside the stack and must contain: `{NAME_OF_COMPONENT, {OPTIONS_OF_COMPONENT}}`
 
 Returns. Table containing the return values of the contained components, in order. Table.
@@ -280,13 +302,14 @@ Returns: Table containing the return values of the contained components, in orde
 
 Groups a list of components vertically. Its size will adapt to the size of the stacked contents.
 
-`pgui:component("vstack",{stroke=true,height=0,margin=3,gap=3,contents={}})`
+`pgui:component("vstack",{stroke=true,height=0,margin=3,gap=3,box=true,contents={}})`
 
 Options:
 - **stroke**. boolean. Show border or not.
 - **height**. number. If 0, the height of the stack wil adapt to its contents, if > 0 it will be set to the value specified.
 - **margin**. number. Margin separating contents from border from all sides.
 - **gap**. number. horizontal gap between components.
+- **box**. boolean. Draw containing box.
 - **contents**. list of tables. A list of tables, each subtable represents a component to put inside the stack and must contain: `{NAME_OF_COMPONENT, {OPTIONS_OF_COMPONENT}}`
 
 Returns: Table containing the return values of the contained components, in order. Table.
@@ -314,13 +337,14 @@ A container box that clips the content that exceeds its size and can be scrolled
 
 To use this component, you must run the function `pgui:activate_clipping()` in your _init function first.
 
-`pgui:component("scrollable",label="scrll",scroll_x=true,scroll_y=false,size=vec(50,50),sensibility=4,content={}})`
+`pgui:component("scrollable",label="scrll",scroll_x=true,scroll_y=false,size=vec(50,50),sensibility=4,stroke=true,content={}})`
 
 Options:
 - **label**. string. REQUIRED. Unique name for keeping internal state.
-- **size**. vector. Desired size of scrollable area. If any axis is set to 0 it will adapt to content's size.
+- **size**. vector. Desired size of scrollable area. If any dimension is bigger than content, it will shrink to content's size. If you see undesired clipping in a dimesion you don't want to scroll, set it to a big number (to be safe, 500)
 - **scroll_x**. boolean. Allow x axis scrolling.
 - **scroll_y**. boolean. Allow y axis scrolling.
+- **stroke**. boolean. Show border or not.
 - **content**. table. A table representing the data of a component to put inside the scrollable area, it must contain: `{NAME_OF_COMPONENT, {OPTIONS_OF_COMPONENT}}`.
 
 Returns: Return value of content component.
@@ -383,3 +407,11 @@ You can also check some of my other work on [itch](https://srsergior.itch.io/) o
 
 - Minor performance improvements
 - Implemented layering
+
+### 1.0.2
+
+- Fixed offset error in scrollable and fixed button response miscalculations inside scrollable
+- Added flr option to hslider
+- Fixed minor layout adjustments
+- Added sprite_box component based on @MaddoScientisto's suggestion
+- Fixed color palette not being passed to children components
