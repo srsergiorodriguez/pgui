@@ -112,7 +112,7 @@ NOTE 2: Some components need to store some persistent information. To achieve th
 NOTE 3: There are a couple of options that ALL components have, so they will not be listed but you can set them:
 
 - **pos**. vector. The position of the component relative to its container (or to the app's window if it has no container). Default: `pos=vec(0,0)`.
-- **color**. table. The color palette used. Default: `color= {7,18,12,0,7,6}`. See the palette section below.
+- **color**. table. The color palette used. Default: `color= {7,18,12,0}`. See the palette section below.
 - **layer**. number. Order of rendering. Default: `layer=0`. pgui normally just renders the components in the order they are created, and that's enough for most cases. However, if you want more control over it, you can set a higher layer number. pgui always renders dropdowns contents one layer higher than its parent toggle button.
 
 ### Basic components
@@ -364,7 +364,7 @@ Check out the examples folder to see some ways to use the library
 
 ## Color Palette
 
-pgui uses a table to store a color palette of six colors. This palette is used in all of the components by default, unless you specify a different palette for a particular component.
+pgui uses a table to store a color palette of four colors. This palette is used in all of the components by default, unless you specify a different palette for a particular component.
 
 The colors in the palette are used in components as follows:
 
@@ -374,8 +374,6 @@ The colors in the palette are used in components as follows:
 |2               |on hover fill for buttons                              |18             |
 |3               |active color for buttons, checkboxes, sliders, etc.    |12             |
 |4               |stroke colors for borders and text                     |0              |
-|5               |not used yet                                           |7              |
-|6               |not used yet                                           |6              |
 
 You can set a new table for your general palette with the function `pgui:set_palette(TABLE)`.
 

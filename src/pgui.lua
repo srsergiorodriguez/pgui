@@ -132,7 +132,7 @@ pgui_components.input.fns.update = function(self,offset)
 		if pgui.stats.blink then
 			pgui:component("box",{
 				pos=vec(store.cursor_pos,self.margin-1+(store.cursor_line*9)),
-				size=vec(1,8),color={col,0,0,col,0,0}
+				size=vec(1,8),color={col,0,0,col}
 			},self)
 		end
 		if keyp("backspace") and store.cursor_idx > 0 then
@@ -296,7 +296,7 @@ pgui_components.hslider.fns.update = function(self,offset)
 	local width = ((self.value - self.min) / range)*self.size.x
 	if (self.flr) self.value = flr(self.value)
 	local s = vec(width,self.size.y)
-	local col = {self.color[3],0,0,0,0,0}
+	local col = {self.color[3],0,0,self.color[4]}
 	if (width > 0) pgui:component("box",{size=s,stroke=self.stroke,color=col},self)
 	local text_pos = vec(2,(self.size.y - 6) / 2)
 	pgui:component("text",{text=self.format(self.value),pos=text_pos},self)
@@ -634,10 +634,10 @@ end
 --RENDER METHODS
 
 function pgui_methods:set_palette(palette)
-	if (#palette == 6) then
+	if (#palette >= 4) then
 		self.stats.palette = palette
 	else
-		notify("Palette must be a table with 6 indexes")
+		notify("Palette must be a table with 4 indexes")
 	end
 end
 
@@ -729,7 +729,7 @@ pgui = setmetatable({
 		stats={
 			t = 0,
 			blink = false,
-			palette = {7,18,12,0,7,6},
+			palette = {7,18,12,0},
 			clipping = false,
 			memos = {text_width={},palette_pos={}},
 			scancodes=pgui_methods:get_scancodes(),
