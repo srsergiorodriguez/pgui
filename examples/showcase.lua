@@ -11,16 +11,12 @@ function _init()
 	selectedmulti = {true,true,false}
 	slidervalue = 50
 	pgui:set_store("disable_drop",false)
-	inputtext = "Text input click!"
+	inputtext = "click'n'write!"
 	colorselected = 1
-	
-	slidervalue = 10
 end
 
 function _update()
 	pgui:refresh()
-	
-	--slidervalue = pgui:component("hslider",{pos=vec(190,20),value=slidervalue})
 	full_test()
 end
 
@@ -28,7 +24,7 @@ function full_test()
 	local dropdown_options = {
 		{"button",{text="DropButton 1",stroke=false}},
 		{"button",{text="DropButton 2",stroke=false}},
-		{"dropdown",{label="submenu",text="Submenu",stroke=true,contents={
+		{"dropdown",{label="submenu",text="Submenu",stroke=false,contents={
 				{"button",{text="SubButton 1",stroke=false}},
 				{"button",{text="SubButton 2",stroke=false}},
 				{"button",{text="SubButton 3",stroke=false}},
@@ -43,16 +39,16 @@ function full_test()
 		{"button",{text="Button"}},
 		{"hslider",{value=slidervalue}},
 		{"checkbox",{value=check}},
-		{"box",{size=vec(100,1),color={5}}}, --just a quick and dirty separator in the stack
+		{"line",{size=vec(100,0)}}, --just a quick and dirty separator in the stack
 		{"multi_select",{options=multioptions,selected=selectedmulti}},
-		{"box",{size=vec(100,1),color={5}}},
+		{"line",{size=vec(100,0)}},
 		{"radio",{options=radiooptions,selected=selectedradio}},
-		{"box",{size=vec(100,1),color={5}}},
+		{"line",{size=vec(100,0)}},
 		{"text",{text="Text input:"}},
 		{"input",{label="myinput",text=inputtext}}
 	}
 		
-	local stack = pgui:component("vstack",{pos=vec(10,20),contents=contents})
+	local stack = pgui:component("vstack",{pos=vec(180,20),contents=contents})
 	
 	--reinsert the outputs from the stack gui into the variables
 	slidervalue = stack[6]
@@ -65,9 +61,9 @@ function full_test()
 	dbg = stack
 	
 	local topbar_options = {
-		{"button",{text="File",stroke=false}},
-		{"button",{text="Edit",stroke=false}},
-		{"dropdown",{label="top_help",text="Help",stroke=false,contents={
+		{"button",{text="Btn",stroke=false}},
+		{"button",{text="Btn2",stroke=false}},
+		{"dropdown",{label="topdrop",text="Drop",stroke=false,contents={
 				{"button",{text="Top Button 1",stroke=false}},
 				{"button",{text="Top Button 2",stroke=false}},
 				{"button",{text="Top Button 3",stroke=false}},
@@ -82,7 +78,9 @@ function full_test()
 	if topbar[4][1] != nil then
 		colorselected = topbar[4][1]
 	end
-
+	if topbar[3][1] or topbar[3][2] or topbar[3][3] or topbar[3][4] then
+		pgui:close_dropdown("topdrop")
+	end
 	pgui:set_store("disable_drop",#topbar[3] > 0) --to disable the menu dropdown when the overlapping topbar menu is open
 	
 	--see the output tree from the topbar
@@ -90,16 +88,11 @@ function full_test()
 end
 
 function _draw()
-	cls(6)
-	rect(0,0,480,11,6)
-	
-	circfill(350,180,slidervalue,colorselected)
-	pgui:draw()
-	
-	
+	cls(6)	
 	print("cpu: "..sub(tostring(stat(1)),1,6),400,18,10)
-	print("SIDEBAR OUTPUT:\n"..table_tree(dbg),150,20,8)
-	print("TOPBAR OUTPUT:\n"..table_tree(dbg2),300,20,8)	
+	print("SIDEBAR OUTPUT:\n"..table_tree(dbg),300,20,8)
+	print("TOPBAR OUTPUT:\n"..table_tree(dbg2),20,100,8)	
+	pgui:draw()
 end
 
 function table_tree(table)

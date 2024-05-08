@@ -37,6 +37,7 @@ Through Buy me a coffee:
       - [Vertical stack](#vertical-stack)
       - [Dropdown](#dropdown)
       - [Scrollable](#scrollable)
+      - [Line](#line)
   - [Examples](#examples)
   - [Color Palette](#color-palette)
   - [Future expansions](#future-expansions)
@@ -45,6 +46,7 @@ Through Buy me a coffee:
   - [Changelog](#changelog)
     - [1.0.1](#101)
     - [1.0.2](#102)
+    - [1.0.3](#103)
 
 ## Installation
 
@@ -60,7 +62,7 @@ For pgui to work, you have two put two basic functions:
 
 `pgui:refresh()` at the beginning of your _update function. This will restart the list of components to render and make some general calculations.
 
-`pgui:draw()` in your _draw function. This will render the components.
+`pgui:draw()` in your _draw function. This will render the components. If you pass a function as argument, it will call it before rendering layer 4 (usually not necessary).
 
 Additionally, in _update, after the refresh function, you put all the components that are part of your desired GUI. There is a set of basic components like buttons, text input boxes, radio buttons, checkboxes, sliders, and others, and there are some layout components that can nest other components and are useful for grouping and organizing, like dropdowns, vertical and horizontal stacks, a covenience top menu bar, and a scrollable container.
 
@@ -107,9 +109,9 @@ NOTE 1: If you want to use default values, you can omit them in the options tabl
 
 NOTE 2: Some components need to store some persistent information. To achieve this, an internal dictionary keeps track of the state of the component. For these components you need to include a unique label in the options. Specially if you have more than one of the same component, so the library can differentiate between them.
 
-NOTE 3: There are a couple of options that ALL components have, so they will not be listed:
+NOTE 3: There are a couple of options that ALL components have, so they will not be listed but you can set them:
 
-- **pos**. vector. The position of the component relative to its container (or to the app window if it has no container). Default: `pos=vec(0,0)`.
+- **pos**. vector. The position of the component relative to its container (or to the app's window if it has no container). Default: `pos=vec(0,0)`.
 - **color**. table. The color palette used. Default: `color= {7,18,12,0,7,6}`. See the palette section below.
 - **layer**. number. Order of rendering. Default: `layer=0`. pgui normally just renders the components in the order they are created, and that's enough for most cases. However, if you want more control over it, you can set a higher layer number. pgui always renders dropdowns contents one layer higher than its parent toggle button.
 
@@ -326,10 +328,11 @@ Options:
 - **margin**. number. Margin separating contents from border from all sides.
 - **gap**. number. Vertical gap between components in vstack.
 - **contents**. list of tables. A list of tables, each subtable represents a component to put inside the vstack and must contain: `{NAME_OF_COMPONENT, {OPTIONS_OF_COMPONENT}}`. See vstack.
+- **disable**. boolean. disable dropdown button
 
 Returns: Table containing the return values of the contained components in its stack, in order. Table.
 
-NOTE: if you want to close the dropdown with code, for instance after clicking a button inside, you can use `pgui:set_store("LABEL_OF_DROPDOWN",false,true)`, by replacing "LABEL_OF_DROPDOWN" with the label you used for your dropdown. This will set the store that keeps track of state of the dropdown to false and will effectively close it.
+NOTE: if you want to close the dropdown with code, for instance after clicking a button inside, you can use `pgui:close_dropdown(LABEL_OF_DROPDOWN)`, by replacing "LABEL_OF_DROPDOWN" with the label you used for your dropdown. This will set the store that keeps track of the internal state of the dropdown to false and will effectively close it.
 
 #### Scrollable
 
@@ -337,17 +340,23 @@ A container box that clips the content that exceeds its size and can be scrolled
 
 To use this component, you must run the function `pgui:activate_clipping()` in your _init function first.
 
-`pgui:component("scrollable",label="scrll",scroll_x=true,scroll_y=false,size=vec(50,50),sensibility=4,stroke=true,content={}})`
+`pgui:component("scrollable",label="scrll",scroll_x=true,scroll_y=false,size=vec(50,50),sensibility=4,content={}})`
 
 Options:
 - **label**. string. REQUIRED. Unique name for keeping internal state.
 - **size**. vector. Desired size of scrollable area. If any dimension is bigger than content, it will shrink to content's size. If you see undesired clipping in a dimesion you don't want to scroll, set it to a big number (to be safe, 500)
 - **scroll_x**. boolean. Allow x axis scrolling.
 - **scroll_y**. boolean. Allow y axis scrolling.
-- **stroke**. boolean. Show border or not.
 - **content**. table. A table representing the data of a component to put inside the scrollable area, it must contain: `{NAME_OF_COMPONENT, {OPTIONS_OF_COMPONENT}}`.
 
 Returns: Return value of content component.
+
+#### Line
+
+There's also a line component that can be used as a separator in stacks.
+
+`pgui:component("line",{size=vec(100,0)})`
+- **size**. vector. x and y positions with respect to **pos**.
 
 ## Examples
 
@@ -372,7 +381,7 @@ You can set a new table for your general palette with the function `pgui:set_pal
 
 ## Future expansions
 
-In the future, I would like to a couple of extra components: a text area, a typewritter text effect, an xy kaoss pad box style, a knob, a plot and oscilloscope...
+In the future, I would like to add a couple of extra components: a text area, a typewritter text effect, an xy kaoss style pad box , a knob, a plot and oscilloscope...
 
 Text input is very simple, it doesn't respond to double clicking or to supr key, only to backspace.
 
@@ -381,9 +390,9 @@ Text input is very simple, it doesn't respond to double clicking or to supr key,
 I tried to make the library efficient, but depending on the number of components you use, it can still can become resource intensive. There are two tricks you can use to consume less cpu:
 
 - Clipping of components is disabled by default, you can keep it like this if you are not using any scrollable component. This will reduce computations a little bit.
-- You can refresh and update your components every other frame by useing a counter and a modulo operator.
+- You can refresh and update your components every other frame by using a counter and a modulo operator.
 
-If the library is too heavy and you need space, you can delete the components that you are not using, just take into account that some components require others (mostly text boxes, text and boxes, so don't delete those!)
+If the library is too heavy and you need space, you can delete the components that you are not using, just take into account that some components require others (mostly text, boxes, text boxes and buttons, so don't delete those!)
 
 ## Support my work!
 
@@ -415,3 +424,9 @@ You can also check some of my other work on [itch](https://srsergior.itch.io/) o
 - Fixed minor layout adjustments
 - Added sprite_box component based on @MaddoScientisto's suggestion
 - Fixed color palette not being passed to children components
+
+### 1.0.3
+
+- Performance update, now components consume less cpu
+- Refactored codebase to make it cleaner and easier to expand
+- Minor display improvements in hslider

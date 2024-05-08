@@ -1,6 +1,6 @@
 --[[
 	pgui - an Immediate Mode GUI library for Picotron
-	v1.0.2
+	v1.0.3
 	By Sergio Rodriguez Gomez
 	https://srsergior.itch.io/ | https://srsergiorodriguez.github.io/code?lang=en
 	MIT License
@@ -59,8 +59,9 @@ end
 pgui_components.box = {fns={}, data={_id="box",size=vec(16,16),stroke=true,active=false,hover=false}}
 pgui_components.box.fns.draw = function(self)
 	local fill = self.color[1]
-	if (self.mouse.over and self.hover) fill = self.color[2]
-	if (self.mouse.left_btn and self.active) fill = self.color[3]
+	local mouse_events = pgui:mouse_events(self)
+	if (mouse_events.over and self.hover) fill = self.color[2]
+	if (mouse_events.left_btn and self.active) fill = self.color[3]
 	local stroke = self.stroke and self.color[4] or fill
 	pgui:_box(self, self.size.x, self.size.y, fill, stroke)
 end
@@ -74,16 +75,16 @@ pgui_components.text_box.fns.update = function(self,offset)
 	local lines = #split(self.text,"\n")
 	local text_height = lines == 1 and 6 or lines * 9
 	self.size = vec(text_width+(self.margin*2),(self.margin*2)+text_height)
-	pgui:component("box",{offset=offset,clip=self.clip,layer=self.layer,size=self.size,hover=self.hover,active=self.active,stroke=self.stroke,color=self.color})
-	pgui:component("text",{offset=offset,clip=self.clip,layer=self.layer,pos=vec(self.margin,self.margin),active=self.active,text=self.text,color=self.color})
+	pgui:component("box",{size=self.size,hover=self.hover,active=self.active,stroke=self.stroke}, self)
+	pgui:component("text",{pos=vec(self.margin,self.margin),active=self.active,text=self.text}, self)
 	return self.text
 end
 
-pgui_components.sprite = {fns={}, data={_id="sprite",sprite=0,size=vec(0,7),fn=function() end}}
+pgui_components.sprite = {fns={}, data={_id="sprite",sprite=0,size=vec(0,7),fn=function() end, reset_palt=true}}
 pgui_components.sprite.fns.draw = function(self)
 	self.fn()
 	pgui:_sprite(self.sprite,self)
-	palt()
+	if (self.reset_palt) palt()
 end
 
 pgui_components.sprite_box = {fns={}, data={_id="sprite_box",sprite=0,margin=2,stroke=true,active=false,hover=false,fn=function() end}}
@@ -91,8 +92,8 @@ pgui_components.sprite_box.fns.update = function(self,offset)
 	local sprite_width = get_spr(self.sprite):width() - 1
 	local sprite_height = get_spr(self.sprite):height() - 1
 	self.size = vec(sprite_width+(self.margin*2),(self.margin*2)+sprite_height)
-	pgui:component("box",{offset=offset,clip=self.clip,layer=self.layer,size=self.size,hover=self.hover,active=self.active,stroke=self.stroke,color=self.color})
-	pgui:component("sprite",{offset=offset,clip=self.clip,layer=self.layer,pos=vec(self.margin,self.margin),active=self.active,sprite=self.sprite,p=self.p})
+	pgui:component("box",{size=self.size,hover=self.hover,active=self.active,stroke=self.stroke},self)
+	pgui:component("sprite",{pos=vec(self.margin,self.margin),active=self.active,sprite=self.sprite,p=self.p},self)
 	return self.sprite
 end
 
@@ -107,7 +108,7 @@ pgui_components.input.fns.update = function(self,offset)
 		},true)
 	end
 	
-	local text_box = pgui:component("text_box",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,text=self.text,margin=self.margin},true)
+	local text_box = pgui:precomponent("text_box",{text=self.text,margin=self.margin},self)
 	text_box:_update()
 	text_box.size.x = (6 * self.charlen) + (self.margin * 2)
 	self.size = text_box.size:copy()
@@ -129,10 +130,10 @@ pgui_components.input.fns.update = function(self,offset)
 		local lines = #split(self.text,"\n")
 		local col = self.color[3]
 		if pgui.stats.blink then
-			pgui:component("box",{offset=offset,clip=self.clip,layer=self.layer,
-				pos=vec(pgui:get_store(self.label,true).cursor_pos,2+(store.cursor_line*9)),
-				size=vec(1,3+(self.margin*2)),color={col,col,col,col,col,col}
-			})
+			pgui:component("box",{
+				pos=vec(store.cursor_pos,self.margin-1+(store.cursor_line*9)),
+				size=vec(1,8),color={col,0,0,col,0,0}
+			},self)
 		end
 		if keyp("backspace") and store.cursor_idx > 0 then
 			local removed = sub(self.text,store.cursor_idx,store.cursor_idx)
@@ -149,7 +150,7 @@ pgui_components.input.fns.update = function(self,offset)
 			store.cursor_idx += 1
 		end
 		local is_shift = false
-		if (key("shift")) is_shift = true --TODO
+		if (key("shift")) is_shift = true
 		for scancode in all(pgui.stats.scancodes) do
 			if keyp(scancode) and self.charlen > #self.text then
 				local str = scancode == "space" and " " or scancode
@@ -163,7 +164,7 @@ pgui_components.input.fns.update = function(self,offset)
 		end
 		
 		--this will help to create a text field component in the future
-		store.cursor_line += #split(self.text,"\n") - lines
+		--store.cursor_line += #split(self.text,"\n") - lines
 		
 		store.cursor_pos = max(0,store.cursor_pos)
 		store.cursor_idx = max(0,store.cursor_idx)
@@ -173,24 +174,22 @@ pgui_components.input.fns.update = function(self,offset)
 end
 
 pgui_components.button = {fns={}, data={_id="button",text="BUTTON",margin=2,stroke=true,disable=false}}
-pgui_components.button.fns.update = function(self,offset,mouse)
-	local text_box = pgui:component("text_box",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,text=self.text,hover=true and not self.disable,active=true and not self.disable,stroke=self.stroke,margin=self.margin},true)
+pgui_components.button.fns.update = function(self,offset)
+	local text_box = pgui:precomponent("text_box",{text=self.text,hover=not self.disable,active=not self.disable,stroke=self.stroke,margin=self.margin},self)
 	text_box:_update()
+	local mouse_events = pgui:mouse_events(text_box)
 	self.size = text_box.size:copy()
-	return pgui:mouse_events(text_box).clicked
+	return mouse_events.clicked
 end
 
 pgui_components.vstack = {fns={}, data={_id="vstack",stroke=true,height=0,margin=3,gap=3,contents={},box=true}}
 pgui_components.vstack.fns.update = function(self,offset)
 	self.size = vec(0,self.margin*2)
 	local y = self.margin
-	if (self.box) pgui:component("box",{offset=offset,clip=self.clip,layer=self.layer,color=self.color,size=self.size,stroke=self.stroke})
+	if (self.box) pgui:component("box",{size=self.size,stroke=self.stroke},self)
 	local upds = {}
 	for content in all(self.contents) do
-		local com = pgui:component(content[1],content[2],true)
-		com.offset = offset
-		com.clip = self.clip
-		com.layer = self.layer
+		local com = pgui:precomponent(content[1],content[2],self)
 		com.pos = vec(self.margin+com.pos.x,y+com.pos.y)
 		if (com._id == "dropdown") com.grow = true
 		local upd = com:_update()
@@ -208,13 +207,10 @@ pgui_components.hstack = {fns={}, data={_id="hstack",stroke=true,width=0,margin=
 pgui_components.hstack.fns.update = function(self,offset)
 	self.size = vec(self.margin*2,0)
 	local x = self.margin
-	if (self.box) pgui:component("box",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,size=self.size,stroke=self.stroke})
+	if (self.box) pgui:component("box",{size=self.size,stroke=self.stroke}, self)
 	local upds = {}
 	for content in all(self.contents) do
-		local com = pgui:component(content[1],content[2],true)
-		com.offset = offset
-		com.clip = self.clip
-		com.layer = self.layer
+		local com = pgui:precomponent(content[1],content[2],self)
 		com.pos = vec(x+com.pos.x,self.margin+com.pos.y)
 		if (com._id == "dropdown") com.grow = false
 		local upd = com:_update()
@@ -230,24 +226,23 @@ end
 
 pgui_components.topbar = {fns={}, data={_id="topbar",width=479,gap=3,contents={}}}
 pgui_components.topbar.fns.update = function(self)
-	local hstack = pgui:component("hstack",{gap=self.gap,layer=self.layer,width=self.width,stroke=false,margin=0,contents=self.contents},true)
-	return hstack:_update()
+	return pgui:component("hstack",{gap=self.gap,width=self.width,stroke=false,margin=0,contents=self.contents},self)
 end
 
 pgui_components.dropdown = {fns={}, data={label="dd",_id="dropdown",grow=false,text="DROPDOWN",stroke=true,margin=2,gap=3,contents={},disable=false}}
 pgui_components.dropdown.fns.update = function(self,offset)
-	local button = pgui:component("button",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,size=self.size,stroke=self.stroke,text=self.text,margin=self.margin,disable=self.disable},true)
-	
+  if (pgui:get_store(self.label,true) == nil) pgui:set_store(self.label,false,true)
+	local button = pgui:precomponent("button",{size=self.size,stroke=self.stroke,text=self.text,margin=self.margin,disable=self.disable},self)
 	local clicked = button:_update()
 	self.size = button.size:copy()
-	pgui:component("line",{clip=self.clip,offset=offset,layer=self.layer,pos=vec(0,button.size.y),size=vec(self.size.x,0),color=self.color}) --a kind of hacky solution to overlapping dropwdown buttons, but it avoids adding lots of code to the library
+	pgui:component("line",{pos=vec(0,button.size.y),size=vec(self.size.x,0)},self)
 	if clicked and not self.disable then
 		local toggle = not pgui:get_store(self.label,true)
 		pgui:set_store(self.label,toggle,true)
 	end
 	if pgui:get_store(self.label,true) then
 		local y = button.size.y
-		local vstack = pgui:component("vstack",{clip=self.clip,offset=offset,layer=self.layer+1,color=self.color,pos=vec(0,y),margin=self.margin,gap=self.gap,contents=self.contents},true)
+		local vstack = pgui:precomponent("vstack",{layer=self.layer+1,pos=vec(0,y),margin=self.margin,gap=self.gap,contents=self.contents},self)
 		local upd = vstack:_update()
 		if (self.grow) self.size.y += vstack.size.y
 		return upd
@@ -255,18 +250,12 @@ pgui_components.dropdown.fns.update = function(self,offset)
 	return {}
 end
 
-pgui_components.scrollable = {fns={}, data={label="scrll",_id="scrollable",scroll_x=false,scroll_y=true,size=vec(50,50),sensibility=4,stroke=true,content={"text_box",{text="scrollable",margin=50}}}}
+pgui_components.scrollable = {fns={}, data={label="scrll",_id="scrollable",scroll_x=false,scroll_y=true,size=vec(50,50),sensibility=4,content={"text_box",{text="scrollable",margin=50}}}}
 pgui_components.scrollable.fns.update = function(self,offset)
-	if pgui:get_store(self.label,true) == nil then
-		pgui:set_store(self.label,{
-			scrolling = vec(0,0)
-		},true)
-	end
+	if (pgui:get_store(self.label,true) == nil) pgui:set_store(self.label,{scrolling = vec(0,0)},true)
 	local store = pgui:get_store(self.label,true)
-	local com = pgui:component(self.content[1],self.content[2],true)
-	com.offset=offset
+	local com = pgui:precomponent(self.content[1],self.content[2],self)
 	com.pos = store.scrolling
-	com.layer = self.layer
 	com.clip = {self.pos.x+self.offset.x,self.pos.y+self.offset.y,self.size.x,self.size.y}
 	local upd = com:_update()
 	if (not self.scroll_x or (com.size.x < self.size.x)) self.size.x = com.size.x
@@ -284,34 +273,33 @@ pgui_components.scrollable.fns.update = function(self,offset)
 			com.pos.x = 0
 		end
 	end	
-		
-	if self.mouse.over then
-		if (self.scroll_y) store.scrolling.y += self.mouse.vs*self.sensibility
-		if (self.scroll_x) store.scrolling.x += self.mouse.hs*self.sensibility
+
+	local mouse_events = pgui:mouse_events(self)
+	if mouse_events.over then
+		if (self.scroll_y) store.scrolling.y += mouse_events.vs*self.sensibility
+		if (self.scroll_x) store.scrolling.x += mouse_events.hs*self.sensibility
 		limit(com,self)
 	end
-	
-	if (self.stroke) pgui:component("rect",{offset=self.offset,clip=self.clip,layer=self.layer,color=self.color,pos=self.pos,size=self.size})
 	return upd
 end
 
 pgui_components.hslider = {fns={}, data={_id="hslider",format=function(v) return v end,min=0,max=100,value=50,size=vec(100,10),stroke=true,flr=false}}
 pgui_components.hslider.fns.update = function(self,offset)
-	local box = pgui:component("box",{clip=self.clip,offset=offset,layer=self.layer,size=self.size,stroke=self.stroke},true)
+	local box = pgui:precomponent("box",{size=self.size,stroke=self.stroke},self)
 	box:_update()
+	local mouse_events = pgui:mouse_events(box)
 	local range = self.max - self.min
-	if box.mouse.left_btn then
-		self.value = self.min + (box.mouse.rel_pos.x / self.size.x) * range
-	end 
+	if mouse_events.left_btn then
+		self.value = self.min + (mouse_events.rel_pos.x / self.size.x) * range
+	end
 	self.value = mid(self.min, self.value, self.max)
 	local width = ((self.value - self.min) / range)*self.size.x
 	if (self.flr) self.value = flr(self.value)
 	local s = vec(width,self.size.y)
-	local col = self.color
-	col[1] = self.color[3]
-	if (width > 0) pgui:component("box",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,size=s,stroke=self.stroke,color=col})
+	local col = {self.color[3],0,0,0,0,0}
+	if (width > 0) pgui:component("box",{size=s,stroke=self.stroke,color=col},self)
 	local text_pos = vec(2,(self.size.y - 6) / 2)
-	pgui:component("text",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,text=self.format(self.value),pos=text_pos})
+	pgui:component("text",{text=self.format(self.value),pos=text_pos},self)
 	return self.value
 end
 
@@ -329,10 +317,10 @@ pgui_components.radio.fns.update = function(self,offset)
 		tw =  text_width > tw and text_width or tw 
 		local pos = vec(0, y)
 		local on  = self.selected == i
-		local radiocircle = pgui:component("radiocircle",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,pos=pos,r=self.r,on=on},true)
+		local radiocircle = pgui:precomponent("radiocircle",{pos=pos,r=self.r,on=on},self)
 		radiocircle:_update()
 		local text_pos = pos+vec(d+self.sep,(d - 7) / 2)
-		pgui:component("text",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,text=opt,pos=text_pos})
+		pgui:component("text",{text=opt,pos=text_pos},self)
 		y += d + self.gap
 		local clicked = pgui:mouse_events(radiocircle).clicked
 		if (clicked) self.selected = i 
@@ -361,10 +349,10 @@ pgui_components.multi_select.fns.update = function(self,offset)
 		tw =  text_width > tw and text_width or tw 
 		local pos = vec(0, y)
 		local on  = selected[i]
-		local multibox = pgui:component("multibox",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,pos=pos,size=vec(d,d),on=on},true)
+		local multibox = pgui:precomponent("multibox",{pos=pos,size=vec(d,d),on=on},self)
 		multibox:_update()
 		local text_pos = pos+vec(d+self.sep,(d - 7) / 2)
-		pgui:component("text",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,text=opt,pos=text_pos})
+		pgui:component("text",{text=opt,pos=text_pos},self)
 		y += d + self.gap
 		local clicked = pgui:mouse_events(multibox).clicked
 		if (clicked) selected[i] = not selected[i]
@@ -376,9 +364,7 @@ end
 
 pgui_components.checkbox = {fns={}, data={_id="checkbox",text="CHECKBOX",value=false,box_size=8,sep=4}}
 pgui_components.checkbox.fns.update = function(self,offset)
-	local selected = {self.value}
-	local options = {self.text}
-	local select = pgui:component("multi_select",{clip=self.clip,offset=offset,layer=self.layer,color=self.color,sep=self.sep,selected=selected,options=options,box_size=self.box_size},true)
+	local select = pgui:precomponent("multi_select",{sep=self.sep,selected={self.value},options={self.text},box_size=self.box_size},self)
 	local upd = select:_update()
 	self.size = select.size
 	return upd[1]
@@ -387,17 +373,28 @@ end
 pgui_components.palette = {fns={}, data={_id="palette",columns=4,gap=3,box_size=10,colors={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15},selected=1}}
 pgui_components.palette.fns.update = function(self,offset)
 	local i = 0
+  local memo_code = self.columns.."_"..self.box_size.."_"..self.gap
+  if pgui.stats.memos.palette_pos[memo_code] == nil then
+    pgui.stats.memos.palette_pos[memo_code] = {}
+  end
+  local pos = pgui.stats.memos.palette_pos[memo_code]
 	for col in all(self.colors) do
 		local new_palette = pgui:copy_table(self.color)
 		new_palette[1] = col
 		new_palette[4] = self.selected == col and new_palette[3] or new_palette[4]
-		local pos = vec((i % self.columns), flr(i / self.columns))
-		pos = pos * (self.box_size+self.gap)
-		local box = pgui:component("box",{clip=self.clip,offset=offset,layer=self.layer,pos=pos,size=vec(self.box_size,self.box_size),stroke=true,color=new_palette},true)
+    
+    if pos[i] == nil then
+		  pos[i] = vec((i % self.columns), flr(i / self.columns))
+		  pos[i] = pos[i] * (self.box_size+self.gap)
+    end
+    
+		local box = pgui:precomponent("box",{pos=pos[i],size=vec(self.box_size,self.box_size),stroke=true,color=new_palette},self)
 		box:_update()
-		if (box.mouse.clicked) self.selected = col
+		if (pgui:mouse_events(box).clicked) self.selected = col
 		i += 1
 	end
+  pgui.stats.memos.palette_pos[memo_code] = pos
+  
 	self.size = vec(
 		((self.box_size + self.gap)*self.columns)-self.gap,
 		((self.box_size+self.gap)*ceil(#self.colors / self.columns))-self.gap
@@ -426,7 +423,7 @@ function pgui_methods:draw(callback)
 			callback()
 		end
 		if self.stats.clipping and #component.clip == 4 then
-			clip(component.clip[1]+1,component.clip[2]+1,component.clip[3]-1,component.clip[4]-1)
+			clip(component.clip[1],component.clip[2],component.clip[3],component.clip[4]+1)
 			component:draw()
 			clip()
 		else
@@ -437,21 +434,34 @@ end
 
 --COMPONENT METHODS
 
-function pgui_methods:component(name, opts, no_update)
+function pgui_methods:component(name, opts, parent_opts)
 	local template = pgui_components[name]
 	if not template then
 		notify("ERROR: pgui component '"..tostring(name).."' does not exist")
-		return self:new_component(pgui_components["unknown"], "_",{})
+    local component = self:new_component(pgui_components["unknown"],{})
+		return component:_update()
 	else
-		return self:new_component(template, opts, no_update)
+    local component = self:new_component(template, opts, parent_opts)
+		return component:_update()
 	end
 end
 
-function pgui_methods:new_component(template, opts, no_update)
+function pgui_methods:precomponent(name, opts, parent_opts)
+	local template = pgui_components[name]
+  return self:new_component(template, opts, parent_opts)
+end
+
+function pgui_methods:new_component(template, opts, parent_opts)
 	local base_data = {pos=vec(0,0),size=vec(0,0),offset=vec(0,0),color=pgui_methods:copy_table(self.stats.palette),clip={},layer=0}
 	local data = {}
 	for k,v in pairs(base_data) do
 		local value = v
+    if parent_opts then
+      if (k == "layer") value = parent_opts.layer
+      if (k == "clip") value = parent_opts.clip
+      if (k == "color") value = parent_opts.color
+      if (k == "offset") value = parent_opts.children_offset
+    end
 		if (opts[k] != nil) value = opts[k]
 		data[k] = value
 	end
@@ -463,11 +473,10 @@ function pgui_methods:new_component(template, opts, no_update)
 			
 	local fns = template.fns
 	function fns:_update()
-		self.mouse = pgui:mouse_events(self)
 		if (self.draw) addcomponent(self)
 		if (self.update) then
-			local offset = pgui:get_offset(self)
-			local upd = self:update(offset)
+			self.children_offset = self.pos + self.offset
+			local upd = self:update(self.children_offset)
 			return upd == nil and self._id or upd
 		else
 			return self._id
@@ -479,18 +488,13 @@ function pgui_methods:new_component(template, opts, no_update)
 	end
 		
 	local component = setmetatable(data, {__index=template.fns})	
-	
-	if no_update then
-		return component --create components without updating them, for composition inside other components
-	else
-		return component:_update()
-	end
+	return component
 end
 
 --UPDATE METHODS
 
-function pgui_methods:get_offset(component)
-	return component.pos+component.offset
+function pgui_methods:close_dropdown(label)
+	self:set_store(label,false,true)
 end
 
 function pgui_methods:get_mouse()
@@ -529,9 +533,8 @@ end
 
 function pgui_methods:get_cursor_pos(margin,text,relx)
 	local sum = margin
-	local charlist = split(text,"")
 	local i = 0
-	for ch in all(charlist) do
+	for ch in all(text) do
 		local v = 0	
 		if ch == "I" or ch == "i" or ch == "l" or ch == "1" then
 			v = 4
@@ -549,9 +552,9 @@ end
 
 function pgui_methods:get_scancodes()
 	local scancodes = {
-		"~","!","@","#","$","%","^","&","*","(",")",
-		"_","-","+","=","[","]","{","}","|",":",";",
-		"'",",",".","<",">","/","?","`",
+		--"~","!","@","#","$","%","^","&","*","(",")",
+		--"_","-","+","=","[","]","{","}","|",":",";",
+		--"'",",",".","<",">","/","?","`",
 		"0","1","2","3","4","5","6","7","8","9",
 		"a","b","c","d","e","f","g","h",
 		"i","j","k","l","m","n","o","p",
@@ -728,7 +731,7 @@ pgui = setmetatable({
 			blink = false,
 			palette = {7,18,12,0,7,6},
 			clipping = false,
-			memos = {text_width={}},
+			memos = {text_width={},palette_pos={}},
 			scancodes=pgui_methods:get_scancodes(),
 			mouse=pgui_methods:get_mouse(),
 			prev_mouse=pgui_methods:get_mouse()
