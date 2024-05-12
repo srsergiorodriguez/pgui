@@ -1,6 +1,6 @@
 --[[
 	pgui - an Immediate Mode GUI library for Picotron
-	v1.0.3
+	v1.0.4
 	By Sergio Rodriguez Gomez
 	https://srsergior.itch.io/ | https://srsergiorodriguez.github.io/code?lang=en
 	MIT License
@@ -67,7 +67,7 @@ pgui_components.box.fns.draw = function(self)
 end
 
 pgui_components.text_box = {fns={}, data={_id="text_box",text="TEXTBOX",margin=2,stroke=true,active=false,hover=false}}
-pgui_components.text_box.fns.update = function(self,offset)
+pgui_components.text_box.fns.update = function(self)
 	if pgui.stats.memos.text_width[self.text] == nil then
 		pgui.stats.memos.text_width[self.text] = pgui:get_text_width(self.text)
 	end
@@ -88,17 +88,18 @@ pgui_components.sprite.fns.draw = function(self)
 end
 
 pgui_components.sprite_box = {fns={}, data={_id="sprite_box",sprite=0,margin=2,stroke=true,active=false,hover=false,fn=function() end}}
-pgui_components.sprite_box.fns.update = function(self,offset)
+pgui_components.sprite_box.fns.update = function(self)
 	local sprite_width = get_spr(self.sprite):width() - 1
 	local sprite_height = get_spr(self.sprite):height() - 1
 	self.size = vec(sprite_width+(self.margin*2),(self.margin*2)+sprite_height)
-	pgui:component("box",{size=self.size,hover=self.hover,active=self.active,stroke=self.stroke},self)
+	local box = pgui:precomponent("box",{size=self.size,hover=self.hover,active=self.active,stroke=self.stroke},self)
+	box:_update()
 	pgui:component("sprite",{pos=vec(self.margin,self.margin),active=self.active,sprite=self.sprite,p=self.p},self)
-	return self.sprite
+	return pgui:mouse_events(box).clicked
 end
 
 pgui_components.input = {fns={}, data={label="input",_id="input",text="INPUT",charlen=16,margin=2}}
-pgui_components.input.fns.update = function(self,offset)
+pgui_components.input.fns.update = function(self)
 	if (pgui:get_store(self.label,true) == nil) then
 		local text_width = pgui:get_text_width(self.text)
 		pgui:set_store(self.label,{
@@ -174,7 +175,7 @@ pgui_components.input.fns.update = function(self,offset)
 end
 
 pgui_components.button = {fns={}, data={_id="button",text="BUTTON",margin=2,stroke=true,disable=false}}
-pgui_components.button.fns.update = function(self,offset)
+pgui_components.button.fns.update = function(self)
 	local text_box = pgui:precomponent("text_box",{text=self.text,hover=not self.disable,active=not self.disable,stroke=self.stroke,margin=self.margin},self)
 	text_box:_update()
 	local mouse_events = pgui:mouse_events(text_box)
@@ -183,7 +184,7 @@ pgui_components.button.fns.update = function(self,offset)
 end
 
 pgui_components.vstack = {fns={}, data={_id="vstack",stroke=true,height=0,margin=3,gap=3,contents={},box=true}}
-pgui_components.vstack.fns.update = function(self,offset)
+pgui_components.vstack.fns.update = function(self)
 	self.size = vec(0,self.margin*2)
 	local y = self.margin
 	if (self.box) pgui:component("box",{size=self.size,stroke=self.stroke},self)
@@ -204,7 +205,7 @@ pgui_components.vstack.fns.update = function(self,offset)
 end
 
 pgui_components.hstack = {fns={}, data={_id="hstack",stroke=true,width=0,margin=3,gap=3,contents={},box=true}}
-pgui_components.hstack.fns.update = function(self,offset)
+pgui_components.hstack.fns.update = function(self)
 	self.size = vec(self.margin*2,0)
 	local x = self.margin
 	if (self.box) pgui:component("box",{size=self.size,stroke=self.stroke}, self)
@@ -230,7 +231,7 @@ pgui_components.topbar.fns.update = function(self)
 end
 
 pgui_components.dropdown = {fns={}, data={label="dd",_id="dropdown",grow=false,text="DROPDOWN",stroke=true,margin=2,gap=3,contents={},disable=false}}
-pgui_components.dropdown.fns.update = function(self,offset)
+pgui_components.dropdown.fns.update = function(self)
   if (pgui:get_store(self.label,true) == nil) pgui:set_store(self.label,false,true)
 	local button = pgui:precomponent("button",{size=self.size,stroke=self.stroke,text=self.text,margin=self.margin,disable=self.disable},self)
 	local clicked = button:_update()
@@ -251,7 +252,7 @@ pgui_components.dropdown.fns.update = function(self,offset)
 end
 
 pgui_components.scrollable = {fns={}, data={label="scrll",_id="scrollable",scroll_x=false,scroll_y=true,size=vec(50,50),sensibility=4,content={"text_box",{text="scrollable",margin=50}}}}
-pgui_components.scrollable.fns.update = function(self,offset)
+pgui_components.scrollable.fns.update = function(self)
 	if (pgui:get_store(self.label,true) == nil) pgui:set_store(self.label,{scrolling = vec(0,0)},true)
 	local store = pgui:get_store(self.label,true)
 	local com = pgui:precomponent(self.content[1],self.content[2],self)
@@ -284,7 +285,7 @@ pgui_components.scrollable.fns.update = function(self,offset)
 end
 
 pgui_components.hslider = {fns={}, data={_id="hslider",format=function(v) return v end,min=0,max=100,value=50,size=vec(100,10),stroke=true,flr=false}}
-pgui_components.hslider.fns.update = function(self,offset)
+pgui_components.hslider.fns.update = function(self)
 	local box = pgui:precomponent("box",{size=self.size,stroke=self.stroke},self)
 	box:_update()
 	local mouse_events = pgui:mouse_events(box)
@@ -304,7 +305,7 @@ pgui_components.hslider.fns.update = function(self,offset)
 end
 
 pgui_components.radio = {fns={}, data={_id="radio",gap=3,r=3,sep=4,selected=1,options={}}}
-pgui_components.radio.fns.update = function(self,offset)
+pgui_components.radio.fns.update = function(self)
 	local y = 0
 	local i = 1
 	local d = self.r * 2
@@ -331,7 +332,7 @@ pgui_components.radio.fns.update = function(self,offset)
 end
 
 pgui_components.multi_select = {fns={}, data={_id="multi_select",gap=3,box_size=7,sep=4,selected={},options={}}}
-pgui_components.multi_select.fns.update = function(self,offset)
+pgui_components.multi_select.fns.update = function(self)
 	if (#self.selected < #self.options) then
 		notify("#options and #selected do not match in multi_select")
 		return
@@ -363,7 +364,7 @@ pgui_components.multi_select.fns.update = function(self,offset)
 end
 
 pgui_components.checkbox = {fns={}, data={_id="checkbox",text="CHECKBOX",value=false,box_size=8,sep=4}}
-pgui_components.checkbox.fns.update = function(self,offset)
+pgui_components.checkbox.fns.update = function(self)
 	local select = pgui:precomponent("multi_select",{sep=self.sep,selected={self.value},options={self.text},box_size=self.box_size},self)
 	local upd = select:_update()
 	self.size = select.size
@@ -371,7 +372,7 @@ pgui_components.checkbox.fns.update = function(self,offset)
 end
 
 pgui_components.palette = {fns={}, data={_id="palette",columns=4,gap=3,box_size=10,colors={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15},selected=1}}
-pgui_components.palette.fns.update = function(self,offset)
+pgui_components.palette.fns.update = function(self)
 	local i = 0
   local memo_code = self.columns.."_"..self.box_size.."_"..self.gap
   if pgui.stats.memos.palette_pos[memo_code] == nil then

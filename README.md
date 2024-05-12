@@ -47,6 +47,7 @@ Through Buy me a coffee:
     - [1.0.1](#101)
     - [1.0.2](#102)
     - [1.0.3](#103)
+    - [1.0.4](#104)
 
 ## Installation
 
@@ -160,7 +161,7 @@ Options:
 - **hover**. boolean. Change color of box when hovered on.
 - **fn**. function. Function to run before drawing the sprite. This can be used to set colors transparence with `palt()` before drawing the sprite. 
 
-Returns: "box". string.
+Returns: if was clicked. boolean.
 
 #### Input
 
@@ -428,3 +429,8 @@ You can also check some of my other work on [itch](https://srsergior.itch.io/) o
 - Performance update, now components consume less cpu
 - Refactored codebase to make it cleaner and easier to expand
 - Minor display improvements in hslider
+
+
+### 1.0.4
+
+- Sprite component now returns if it was clicked
