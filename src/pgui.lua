@@ -1,6 +1,6 @@
 --[[
 	pgui - an Immediate Mode GUI library for Picotron
-	v1.0.4
+	v1.0.3
 	By Sergio Rodriguez Gomez
 	https://srsergior.itch.io/ | https://srsergiorodriguez.github.io/code?lang=en
 	MIT License
@@ -29,7 +29,7 @@ pgui_components.rect.fns.draw = function(self)
 	pgui:_rect(self.pos.x+self.offset.x,self.pos.y+self.offset.y,self.size.x,self.size.y,self.color[4],false)
 end
 
-pgui_components.line = {fns={}, data={_id="rect",size=vec(16,16)}}
+pgui_components.line = {fns={}, data={_id="line",size=vec(16,16)}}
 pgui_components.line.fns.draw = function(self)
 	local x = self.pos.x+self.offset.x
 	local y = self.pos.y+self.offset.y

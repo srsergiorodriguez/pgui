@@ -433,4 +433,6 @@ You can also check some of my other work on [itch](https://srsergior.itch.io/) o
 
 ### 1.0.4
 
-- Sprite component now returns if it was clicked
+- Sprite component now returns if it was clicked so it can act like a button
+- Fixed set_palette function
+- Added close_dropdown function
