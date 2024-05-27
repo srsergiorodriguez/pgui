@@ -320,7 +320,7 @@ Returns: Table containing the return values of the contained components, in orde
 #### Dropdown
 
 A vertical stack with a button that toggles the display of it's contents
-`pgui:component("dropdown",{label="dd",text="DROPDOWN",stroke=true,margin=2,gap=3,contents={},disable=false}})`
+`pgui:component("dropdown",{label="dd",text="DROPDOWN",stroke=true,margin=2,gap=3,contents={},disable=false})`
 
 Options:
 - **label**. string. REQUIRED. Unique name for keeping internal state.
