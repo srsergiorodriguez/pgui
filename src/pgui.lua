@@ -157,7 +157,7 @@ pgui_components.input.fns.update = function(self)
 				local str = scancode == "space" and " " or scancode
 				--str = str == "enter" and "\n" or str --for future text field
 				str = str == "enter" and "" or str
-				str = is_shift and str:upper() or str
+				str = is_shift and get_scancode_upper(str) or str -- Use my scancode_upper func to do the work instead of lua's upper()
 				self.text = sub(self.text,0,store.cursor_idx)..str..sub(self.text,store.cursor_idx+1)
 				store.cursor_pos += pgui:get_text_width(str)
 				store.cursor_idx += 1
@@ -551,11 +551,11 @@ function pgui_methods:get_cursor_pos(margin,text,relx)
 	return {sum,i}
 end
 
-function pgui_methods:get_scancodes()
+-- Vinny's PGUI Mods:
+function pgui_methods:get_scancodes() -- Removed uppercase and special characters from scancodes table
 	local scancodes = {
-		--"~","!","@","#","$","%","^","&","*","(",")",
-		--"_","-","+","=","[","]","{","}","|",":",";",
-		--"'",",",".","<",">","/","?","`",
+		"-","=","[","]","\\",";",
+		"'",",",".","/","`",
 		"0","1","2","3","4","5","6","7","8","9",
 		"a","b","c","d","e","f","g","h",
 		"i","j","k","l","m","n","o","p",
@@ -564,6 +564,40 @@ function pgui_methods:get_scancodes()
 	}
 	return scancodes
 end
+
+function get_scancode_upper(scancode)
+	local scancodes = { -- Same table as pgui_methods:get_scancodes(), you should probably just put that instead of redefining it
+		"-","=","[","]","\\",";",
+		"'",",",".","/","`",
+		"0","1","2","3","4","5","6","7","8","9",
+		"a","b","c","d","e","f","g","h",
+		"i","j","k","l","m","n","o","p",
+		"q","r","s","t","u","v","w","x",
+		"y","z","space","enter"
+	}
+	
+	local scancodesupper = { -- The uppercase characters + special characters that were removed from scancodes
+		"_","+","{","}","|",":",
+		"\"", "<",">","?","~",
+		")","!","@","#","$","%","^","&","*","(",
+		"A","B","C","D","E","F","G","H",
+		"I","J","K","L","M","N","O","P",
+		"Q","R","S","T","U","V","W","X",
+		"Y","Z","space","enter"
+	}
+
+	return scancodesupper[indexOf(scancodes, scancode)] -- Get index of scancodes, MAKE SURE SPECIAL CHARACTERS ARE IN THE SAME ORDER AS THEIR LOWERCASE VERSIONS
+end
+
+function indexOf(array, value) -- indexOf function because I don't think lua has one. If it does, feel free to replace
+    for i, v in ipairs(array) do
+        if v == value then
+            return i
+        end
+    end
+    return nil
+end
+-- End Vinny's PGUI Mods
 
 function pgui_methods:copy_table(table)
 	local new_table = {}
