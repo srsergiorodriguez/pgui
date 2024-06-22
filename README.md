@@ -71,7 +71,7 @@ All components are created by using the component function. The first argument i
 
 `pgui:component(NAME, {OPTIONS})`
 
-Components return values that you can use as like in your code. In most cases, you have to feed the return value back into a particular option of the component so it can keep track of its state.
+Components return values that you can use as you like in your code. In most cases, you have to feed the return value back into a particular option of the component so it can keep track of its state.
 
 This is a simple example of a slider controlling the size of a circle:
 
