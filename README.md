@@ -436,3 +436,5 @@ You can also check some of my other work on [itch](https://srsergior.itch.io/) o
 - Sprite component now returns if it was clicked so it can act like a button
 - Fixed set_palette function
 - Added close_dropdown function
+- Minor ajustments on multiselect and radio buttons
+- Added better support for special characters, based on @yeetree's suggestion

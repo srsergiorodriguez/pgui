@@ -1,6 +1,6 @@
 --[[
 	pgui - an Immediate Mode GUI library for Picotron
-	v1.0.3
+	v1.0.4
 	By Sergio Rodriguez Gomez
 	https://srsergior.itch.io/ | https://srsergiorodriguez.github.io/code?lang=en
 	MIT License
@@ -152,12 +152,12 @@ pgui_components.input.fns.update = function(self)
 		end
 		local is_shift = false
 		if (key("shift")) is_shift = true
-		for scancode in all(pgui.stats.scancodes) do
+		for i,scancode in ipairs(pgui.stats.scancodes) do
 			if keyp(scancode) and self.charlen > #self.text then
 				local str = scancode == "space" and " " or scancode
 				--str = str == "enter" and "\n" or str --for future text field
 				str = str == "enter" and "" or str
-				str = is_shift and get_scancode_upper(str) or str -- Use my scancode_upper func to do the work instead of lua's upper()
+				str = is_shift and get_scancode_upper(i) or str -- Use my scancode_upper func to do the work instead of lua's upper()
 				self.text = sub(self.text,0,store.cursor_idx)..str..sub(self.text,store.cursor_idx+1)
 				store.cursor_pos += pgui:get_text_width(str)
 				store.cursor_idx += 1
@@ -320,7 +320,7 @@ pgui_components.radio.fns.update = function(self)
 		local on  = self.selected == i
 		local radiocircle = pgui:precomponent("radiocircle",{pos=pos,r=self.r,on=on},self)
 		radiocircle:_update()
-		local text_pos = pos+vec(d+self.sep,(d - 7) / 2)
+		local text_pos = pos+vec(d+self.sep,(d - 6) / 2)
 		pgui:component("text",{text=opt,pos=text_pos},self)
 		y += d + self.gap
 		local clicked = pgui:mouse_events(radiocircle).clicked
@@ -352,7 +352,7 @@ pgui_components.multi_select.fns.update = function(self)
 		local on  = selected[i]
 		local multibox = pgui:precomponent("multibox",{pos=pos,size=vec(d,d),on=on},self)
 		multibox:_update()
-		local text_pos = pos+vec(d+self.sep,(d - 7) / 2)
+		local text_pos = pos+vec(d+self.sep,(d - 6) / 2)
 		pgui:component("text",{text=opt,pos=text_pos},self)
 		y += d + self.gap
 		local clicked = pgui:mouse_events(multibox).clicked
@@ -551,8 +551,7 @@ function pgui_methods:get_cursor_pos(margin,text,relx)
 	return {sum,i}
 end
 
--- Vinny's PGUI Mods:
-function pgui_methods:get_scancodes() -- Removed uppercase and special characters from scancodes table
+function pgui_methods:get_scancodes()
 	local scancodes = {
 		"-","=","[","]","\\",";",
 		"'",",",".","/","`",
@@ -565,18 +564,8 @@ function pgui_methods:get_scancodes() -- Removed uppercase and special character
 	return scancodes
 end
 
-function get_scancode_upper(scancode)
-	local scancodes = { -- Same table as pgui_methods:get_scancodes(), you should probably just put that instead of redefining it
-		"-","=","[","]","\\",";",
-		"'",",",".","/","`",
-		"0","1","2","3","4","5","6","7","8","9",
-		"a","b","c","d","e","f","g","h",
-		"i","j","k","l","m","n","o","p",
-		"q","r","s","t","u","v","w","x",
-		"y","z","space","enter"
-	}
-	
-	local scancodesupper = { -- The uppercase characters + special characters that were removed from scancodes
+function get_scancode_upper(index)
+	local scancodesupper = {
 		"_","+","{","}","|",":",
 		"\"", "<",">","?","~",
 		")","!","@","#","$","%","^","&","*","(",
@@ -585,19 +574,8 @@ function get_scancode_upper(scancode)
 		"Q","R","S","T","U","V","W","X",
 		"Y","Z","space","enter"
 	}
-
-	return scancodesupper[indexOf(scancodes, scancode)] -- Get index of scancodes, MAKE SURE SPECIAL CHARACTERS ARE IN THE SAME ORDER AS THEIR LOWERCASE VERSIONS
+	return scancodesupper[index] -- Get index of scancodes, MAKE SURE SPECIAL CHARACTERS ARE IN THE SAME ORDER AS THEIR LOWERCASE VERSIONS
 end
-
-function indexOf(array, value) -- indexOf function because I don't think lua has one. If it does, feel free to replace
-    for i, v in ipairs(array) do
-        if v == value then
-            return i
-        end
-    end
-    return nil
-end
--- End Vinny's PGUI Mods
 
 function pgui_methods:copy_table(table)
 	local new_table = {}
