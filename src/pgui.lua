@@ -94,7 +94,7 @@ pgui_components.sprite_box.fns.update = function(self)
 	self.size = vec(sprite_width+(self.margin*2),(self.margin*2)+sprite_height)
 	local box = pgui:precomponent("box",{size=self.size,hover=self.hover,active=self.active,stroke=self.stroke},self)
 	box:_update()
-	pgui:component("sprite",{pos=vec(self.margin,self.margin),active=self.active,sprite=self.sprite,p=self.p},self)
+	pgui:component("sprite",{pos=vec(self.margin,self.margin),active=self.active,sprite=self.sprite,fn=self.fn,reset_palt=true},self)
 	return pgui:mouse_events(box).clicked
 end
 
